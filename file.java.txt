@@ -1,0 +1,100 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+public class SuperClockPro extends JFrame {
+    private JLabel timeLabel, dateLabel, statusLabel;
+    private JPanel mainPanel;
+    private boolean is24HourFormat = true;
+    private final SimpleDateFormat timeFormat24 = new SimpleDateFormat("HH:mm:ss");
+    private final SimpleDateFormat timeFormat12 = new SimpleDateFormat("hh:mm:ss a");
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE, MMMM dd, yyyy");
+
+    public SuperClockPro() {
+        setTitle("🕒 SuperClock Pro");
+        setSize(600, 300);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setLocationRelativeTo(null); // Center screen
+        setUndecorated(true); // No window borders
+
+        // Rounded frame look
+        setShape(new java.awt.geom.RoundRectangle2D.Double(0, 0, 600, 300, 50, 50));
+
+        initUI();
+        startClock();
+
+        setVisible(true);
+    }
+
+    private void initUI() {
+        mainPanel = new JPanel();
+        mainPanel.setLayout(new BorderLayout());
+        mainPanel.setBackground(Color.BLACK);
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        // Time label
+        timeLabel = new JLabel("", SwingConstants.CENTER);
+        timeLabel.setFont(new Font("Consolas", Font.BOLD, 60));
+        timeLabel.setForeground(Color.GREEN);
+
+        // Date label
+        dateLabel = new JLabel("", SwingConstants.CENTER);
+        dateLabel.setFont(new Font("Arial", Font.PLAIN, 24));
+        dateLabel.setForeground(Color.LIGHT_GRAY);
+
+        // Status label
+        statusLabel = new JLabel("Made with ❤️ in Java | Press T to toggle time format", SwingConstants.CENTER);
+        statusLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+        statusLabel.setForeground(Color.WHITE);
+
+        // Top panel for close/minimize
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        topPanel.setOpaque(false);
+
+        JButton exitBtn = new JButton("✖");
+        exitBtn.setForeground(Color.RED);
+        exitBtn.setFocusPainted(false);
+        exitBtn.setBackground(Color.BLACK);
+        exitBtn.setBorder(null);
+        exitBtn.setFont(new Font("Arial", Font.BOLD, 20));
+        exitBtn.addActionListener(e -> System.exit(0));
+
+        topPanel.add(exitBtn);
+
+        // Add key listener for toggle
+        mainPanel.setFocusable(true);
+        mainPanel.requestFocusInWindow();
+        mainPanel.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyChar() == 't' || e.getKeyChar() == 'T') {
+                    is24HourFormat = !is24HourFormat;
+                }
+            }
+        });
+
+        mainPanel.add(topPanel, BorderLayout.NORTH);
+        mainPanel.add(timeLabel, BorderLayout.CENTER);
+        mainPanel.add(dateLabel, BorderLayout.SOUTH);
+        mainPanel.add(statusLabel, BorderLayout.PAGE_END);
+
+        add(mainPanel);
+    }
+
+    private void startClock() {
+        Timer timer = new Timer(1000, e -> {
+            Date now = new Date();
+            String timeStr = is24HourFormat ? timeFormat24.format(now) : timeFormat12.format(now);
+            String dateStr = dateFormat.format(now);
+            timeLabel.setText(timeStr);
+            dateLabel.setText(dateStr);
+        });
+        timer.start();
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(SuperClockPro::new);
+    }
+}
